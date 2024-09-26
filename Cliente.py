@@ -20,15 +20,15 @@ class Cliente:
 # end class Cliente
 
 # Função para ler os dados da planilha e criar objetos Cliente
-def read_from_excel(filepath):
+def read_from_excel ( filepath ):
     # Ler planilha do Excel
-    df = pd.read_excel(filepath)
+    df = pd.read_excel( filepath )
 
     # Lista de Cliente
     clientes = []
 
     # Iterar sobre cada linha da planilha e criar um objeto Cliente
-    for index, row in df.iterrows():
+    for index, row in df.iterrows( ):
         
         # Construir endereço como um dicionário
         endereco = {
@@ -69,9 +69,10 @@ def read_from_excel(filepath):
         )
 
         # Adicionar o novo cliente à lista
-        clientes.append(cliente)
+        clientes.append( cliente )
 
-    return clientes  # Retornar a lista de Clientes
+    return clientes  # Retornar lista de Clientes
+pass
 # end read_from_excel ( )
 
 # Função para salvar os clientes em uma planilha Excel
@@ -82,46 +83,37 @@ def write_to_excel(clientes, output_filepath):
     # Iterar sobre os clientes e criar um dicionário com os dados
     for cliente in clientes:
         cliente_data = {
-            'Razao Social': cliente.razao_social,
-            'PF/PJ': cliente.pf_pj,
-            'Site Empresa': cliente.site_empresa,
-            'CPF/CNPJ': cliente.cpf_cnpj,
-            'Tipo Empresa': cliente.tipo_empresa,
-            'Logradouro': cliente.endereco['logradouro'],
-            'Numero': cliente.endereco['numero'],
-            'Bairro': cliente.endereco['bairro'],
-            'Complemento': cliente.endereco['complemento'],
-            'Municipio': cliente.endereco['municipio'],
-            'UF': cliente.endereco['uf'],
-            'CEP': cliente.endereco['cep'],
+            'Razao Social'      : cliente.razao_social,
+            'PF/PJ'             : cliente.pf_pj,
+            'CPF/CNPJ'          : cliente.cpf_cnpj,
+            'Tipo Empresa'      : cliente.tipo_empresa,
+            'Logradouro'        : cliente.endereco['logradouro'],
+            'Numero'            : cliente.endereco['numero'],
+            'Bairro'            : cliente.endereco['bairro'],
+            'Complemento'       : cliente.endereco['complemento'],
+            'Municipio'         : cliente.endereco['municipio'],
+            'UF'                : cliente.endereco['uf'],
+            'CEP'               : cliente.endereco['cep'],
             'Telefone Empresa 1': cliente.telefones_empresa[0] if len(cliente.telefones_empresa) > 0 else '',
             'Telefone Empresa 2': cliente.telefones_empresa[1] if len(cliente.telefones_empresa) > 1 else '',
-            'Nome Contato': cliente.nome_contato,
-            'Email Contato': cliente.email_contato,
-            'Cargo Contato': cliente.cargo_contato,
+            'Telefone Empresa 3': cliente.telefones_empresa[2] if len(cliente.telefones_empresa) > 1 else '',
+            'Site Empresa'      : cliente.site_empresa,
+            'Nome Contato'      : cliente.nome_contato,
+            'Email Contato'     : cliente.email_contato,
+            'Cargo Contato'     : cliente.cargo_contato,
             'Telefone Contato 1': cliente.telefones_contato[0] if len(cliente.telefones_contato) > 0 else '',
             'Telefone Contato 2': cliente.telefones_contato[1] if len(cliente.telefones_contato) > 1 else '',
-            'Apresentacao': cliente.apresentacao
+            'Telefone Contato 3': cliente.telefones_contato[2] if len(cliente.telefones_contato) > 1 else '',
+            'Apresentacao'      : cliente.apresentacao
         }
         
         # Adicionar o dicionário à lista de dados
-        data.append(cliente_data)
+        data.append( cliente_data )
 
     # Converter a lista de dicionários em um DataFrame do pandas
-    df = pd.DataFrame(data)
+    df = pd.DataFrame( data )
 
     # Salvar o DataFrame em um arquivo Excel
-    df.to_excel(output_filepath, index=False)
+    df.to_excel( output_filepath, index=False )
+pass
 # end write_to_excel ( )
-
-# Caminho do arquivo Excel
-input_filepath = 'C:/Users/Vinishow/Downloads/Formulario_Respostas.xlsx'
-output_filepath = 'C:/Users/Vinishow/Downloads/Clientes.xlsx'
-
-clientes = read_from_excel( input_filepath )
-
-if clientes:
-    write_to_excel( clientes, output_filepath )
-    print(f"Arquivo '{output_filepath}' criado com sucesso!")
-else:
-    print("Nenhum cliente encontrado na planilha.")
