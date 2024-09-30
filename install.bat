@@ -5,6 +5,8 @@ pip install pydrive
 pip install openpyxl
 pip install secure-smtplib
 pip install python-dotenv
+pip install pywin32
+
 
 REM Executar o programa
 cls

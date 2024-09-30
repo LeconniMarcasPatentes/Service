@@ -13,7 +13,7 @@ class Vendedor:
   def calcular_comissao(self):
     nomeVendedorDoEmail = self.email.split('@')[0]
 
-    # ID dos vendedores
+    # comissao dos vendedores
     vendedoresAtivos = {
       'marconnirodrigues': 1,
       'katianeves': 40,
