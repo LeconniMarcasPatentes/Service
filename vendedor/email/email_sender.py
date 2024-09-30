@@ -1,5 +1,6 @@
 import win32com.client as win32
 import vendedor.email
+import Cliente
 
 # Inicializa o Outlook
 outlook = win32.Dispatch("Outlook.Application")
@@ -15,8 +16,9 @@ message.Display()  # Exibe o e-mail antes de enviar (pode ser removido se não q
 message.To = vendedor.email  # Para
 message.Bcc = emails  # Cópia oculta
 
-# Assunto e corpo do e-mail
-message.Subject = "Mensagem"
+# Assunto e corpo do e-mail 
+# falta colocar o nome da empresa
+message.Subject = "Contrato de venda empres:" + Cliente.razao
 message.Body = "Testes de envio"
 
 # Corpo em HTML com uma imagem

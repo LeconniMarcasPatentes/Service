@@ -1,6 +1,0 @@
-pip install pandas
-pip instal pydrive
-pip instal openpyxl
-pip install python-docx
-pip install mailmerge
-pip install docx-mailmerge
