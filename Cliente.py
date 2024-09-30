@@ -1,4 +1,6 @@
 import pandas as pd
+from docx import Document
+from datetime import datetime
 
 # Classe Cliente
 class Cliente:
@@ -17,6 +19,9 @@ class Cliente:
         self.cargo_contato     = cargo_contato      # Cargo do Contato
         self.telefones_contato = telefones_contato  # Telefones de Contatos (Lista)
         self.apresentacao      = apresentacao       # Tipo de Apresentação (Figurativa, Mista, Nominativa)
+        
+    def __repr__(self):
+        return f"Cliente(Razão Social: {self.razao_social}, CPF/CNPJ: {self.cpf_cnpj}, Endereço: {self.endereco}, Porte: {self.tipo_empresa})"
 # end class Cliente
 
 # Função para ler os dados da planilha e criar objetos Cliente
@@ -76,7 +81,7 @@ pass
 # end read_from_excel ( )
 
 # Função para salvar os clientes em uma planilha Excel
-def write_to_excel(clientes, output_filepath):
+def write_to_excel( clientes, output_filepath ):
     # Lista para armazenar os dados dos clientes como dicionários
     data = []
 
@@ -117,3 +122,66 @@ def write_to_excel(clientes, output_filepath):
     df.to_excel( output_filepath, index=False )
 pass
 # end write_to_excel ( )
+
+def write_to_docs ( template_path, output_path, cliente ):
+    doc = Document( template_path )
+    
+    data_atual = datetime.now().strftime("%d/%m/%Y")  # Formato: dia/mês/ano
+    
+    for paragrafo in doc.paragraphs :
+        texto = paragrafo.text
+        texto = texto.split()
+        
+        if '[NOME_CONTRATANTE],' in texto:
+            paragrafo.text = paragrafo.text.replace( '[NOME_CONTRATANTE],', cliente.razao_social.upper( )+ "," )
+            
+        if '[NACIONALIDADE_CONTRATANTE]' in texto:
+            paragrafo.text = paragrafo.text.replace( '[NACIONALIDADE_CONTRATANTE]', 'brasileira' )
+            
+        if '[CNPJ_CONTRATANTE],' in texto:
+            paragrafo.text = paragrafo.text.replace( '[CNPJ_CONTRATANTE],', formatar_cpf(cliente.cpf_cnpj)+"," if cliente.pf_pj == 'PF' 
+                                                    else formatar_cnpj(cliente.cpf_cnpj)+"," ) 
+                
+        if '[ENDERECO_CONTRATANTE],' in texto:
+            endereco_completo = f"{cliente.endereco['logradouro']}, {cliente.endereco['numero']}, {cliente.endereco['bairro']}, {cliente.endereco['municipio']}/{cliente.endereco['uf']} - {formatar_cep(cliente.endereco['cep'])}"  
+            paragrafo.text = paragrafo.text.replace('[ENDERECO_CONTRATANTE],', endereco_completo+",")
+                        
+        if '[TITULO_PATENTE]' in texto:
+            paragrafo.text = paragrafo.text.replace( '[TITULO_PATENTE]', cliente.razao_social.upper( ) )   
+        
+        if '[VALOR_SERVIÇO]' in texto:
+            paragrafo.text = paragrafo.text.replace( '[VALOR_SERVIÇO]', '10.000,00')  
+                
+        if '[VALOR_INICIAL]' in texto:
+            paragrafo.text = paragrafo.text.replace( '[VALOR_INICIAL]', '5.000,00') 
+            
+        if '[VALOR_FINAL]' in texto:
+            paragrafo.text = paragrafo.text.replace( '[VALOR_FINAL]', '5.000,00')  
+                
+        if '[CIDADE_CONTRATANTE]' in texto:
+            paragrafo.text = paragrafo.text.replace( '[CIDADE_CONTRATANTE]', cliente.endereco['municipio'] )
+                    
+        if '[LOCAL_DATA]' in texto:
+            paragrafo.text = paragrafo.text.replace( '[LOCAL_DATA]', data_atual )
+
+    doc.save( output_path )
+pass
+# end write_to_docs ( )
+
+# Formatar CPF no padrão 000.000.000-00
+def formatar_cpf ( cpf ):
+    cpf = str(cpf).zfill(11)
+    return f'{cpf[:3]}.{cpf[3:6]}.{cpf[6:9]}-{cpf[9:]}'
+# end formatar_cpf
+
+# Formatar o CNPJ no padrão 00.000.000/0000-00
+def formatar_cnpj ( cnpj ):
+    cnpj = str(cnpj).zfill(14)
+    return f'{cnpj[:2]}.{cnpj[2:5]}.{cnpj[5:8]}/{cnpj[8:12]}-{cnpj[12:]}'
+# end formatar_cnpj
+
+# Formatar o CEP no padrão 00000-000
+def formatar_cep ( cep ):
+    cep = str(cep).zfill(8)
+    return f'{cep[:5]}-{cep[5:]}'
+# end formatar_cep
