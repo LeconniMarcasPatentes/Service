@@ -4,6 +4,7 @@ from datetime import datetime
 
 # Classe Cliente
 class Cliente:
+    # Cliente ( )
     def __init__(self, razao_social, pf_pj, site_empresa, cpf_cnpj, tipo_empresa, 
                  endereco, telefones_empresa, nome_contato, email_contato, cargo_contato, 
                  telefones_contato, apresentacao):
@@ -19,23 +20,24 @@ class Cliente:
         self.cargo_contato     = cargo_contato      # Cargo do Contato
         self.telefones_contato = telefones_contato  # Telefones de Contatos (Lista)
         self.apresentacao      = apresentacao       # Tipo de Apresentação (Figurativa, Mista, Nominativa)
-        
+    
+    # ToString ( )
     def __repr__(self):
         return f"Cliente(Razão Social: {self.razao_social}, CPF/CNPJ: {self.cpf_cnpj}, Endereço: {self.endereco}, Porte: {self.tipo_empresa})"
 # end class Cliente
 
-# Função para ler os dados da planilha e criar objetos Cliente
+"""
+    Ler uma planilha de clientes.
+    @return Lista de Clientes.
+"""
 def read_from_excel ( filepath ):
-    # Ler planilha do Excel
+    
     df = pd.read_excel( filepath )
 
-    # Lista de Cliente
     clientes = []
 
-    # Iterar sobre cada linha da planilha e criar um objeto Cliente
     for index, row in df.iterrows( ):
         
-        # Construir endereço como um dicionário
         endereco = {
             "logradouro" : row['LOGRADOURO'],
             "numero"     : row['NUMERO'],
@@ -46,15 +48,12 @@ def read_from_excel ( filepath ):
             "cep"        : row['CEP']
         }
 
-        # Capturar telefones da empresa
         telefones_empresa = [row['TELEFONE'], row.get('TELEFONE 2', None), row.get('TELEFONE 3', None)]
         telefones_empresa = [tel for tel in telefones_empresa if tel]  # Remover valores nulos
 
-        # Capturar telefones de contato
         telefones_contato = [row['TELEFONE/CELULAR'], row.get('TELEFONE/CELULAR 2', None), row.get('TELEFONE/CELULAR 3', None)]
         telefones_contato = [tel for tel in telefones_contato if tel]  # Remover valores nulos
 
-        # Capturar CPF ou CNPJ dependendo do tipo de pessoa (PF ou PJ)
         cpf_cnpj = row['CPF'] if row['PF/PJ'] == 'PF' else row['CNPJ']
 
         # Criar o objeto Cliente
@@ -73,19 +72,18 @@ def read_from_excel ( filepath ):
             apresentacao      = row['APRESENTACAO']
         )
 
-        # Adicionar o novo cliente à lista
         clientes.append( cliente )
 
-    return clientes  # Retornar lista de Clientes
+    return clientes
 pass
 # end read_from_excel ( )
 
-# Função para salvar os clientes em uma planilha Excel
+"""
+    Gravar numa planilha uma lista de Clientes. 
+"""
 def write_to_excel( clientes, output_filepath ):
-    # Lista para armazenar os dados dos clientes como dicionários
     data = []
 
-    # Iterar sobre os clientes e criar um dicionário com os dados
     for cliente in clientes:
         cliente_data = {
             'Razao Social'      : cliente.razao_social,
@@ -112,17 +110,17 @@ def write_to_excel( clientes, output_filepath ):
             'Apresentacao'      : cliente.apresentacao
         }
         
-        # Adicionar o dicionário à lista de dados
         data.append( cliente_data )
 
-    # Converter a lista de dicionários em um DataFrame do pandas
     df = pd.DataFrame( data )
 
-    # Salvar o DataFrame em um arquivo Excel
     df.to_excel( output_filepath, index=False )
 pass
 # end write_to_excel ( )
 
+"""
+    Escrever os dados de um cliente no contrato.
+"""
 def write_to_docs ( template_path, output_path, cliente ):
     doc = Document( template_path )
     
@@ -130,7 +128,7 @@ def write_to_docs ( template_path, output_path, cliente ):
     
     for paragrafo in doc.paragraphs :
         texto = paragrafo.text
-        texto = texto.split()
+        # texto = texto.split()
         
         if '[NOME_CONTRATANTE],' in texto:
             paragrafo.text = paragrafo.text.replace( '[NOME_CONTRATANTE],', cliente.razao_social.upper( )+ "," )
@@ -142,9 +140,9 @@ def write_to_docs ( template_path, output_path, cliente ):
             paragrafo.text = paragrafo.text.replace( '[CNPJ_CONTRATANTE],', formatar_cpf(cliente.cpf_cnpj)+"," if cliente.pf_pj == 'PF' 
                                                     else formatar_cnpj(cliente.cpf_cnpj)+"," ) 
                 
-        if '[ENDERECO_CONTRATANTE],' in texto:
+        if '[ENDERCO_CONTRATANTE],' in texto:
             endereco_completo = f"{cliente.endereco['logradouro']}, {cliente.endereco['numero']}, {cliente.endereco['bairro']}, {cliente.endereco['municipio']}/{cliente.endereco['uf']} - {formatar_cep(cliente.endereco['cep'])}"  
-            paragrafo.text = paragrafo.text.replace('[ENDERECO_CONTRATANTE],', endereco_completo+",")
+            paragrafo.text = paragrafo.text.replace('[ENDERCO_CONTRATANTE],', endereco_completo+",")
                         
         if '[TITULO_PATENTE]' in texto:
             paragrafo.text = paragrafo.text.replace( '[TITULO_PATENTE]', cliente.razao_social.upper( ) )   
@@ -180,8 +178,8 @@ def formatar_cnpj ( cnpj ):
     return f'{cnpj[:2]}.{cnpj[2:5]}.{cnpj[5:8]}/{cnpj[8:12]}-{cnpj[12:]}'
 # end formatar_cnpj
 
-# Formatar o CEP no padrão 00000-000
+# Formatar o CEP no padrão 00.000-000
 def formatar_cep ( cep ):
     cep = str(cep).zfill(8)
-    return f'{cep[:5]}-{cep[5:]}'
+    return f'{cep[:2]}.{cep[:5]}-{cep[5:]}'
 # end formatar_cep
