@@ -24,6 +24,8 @@ class Cliente:
     # ToString ( )
     def __repr__(self):
         return f"Cliente(Razão Social: {self.razao_social}, CPF/CNPJ: {self.cpf_cnpj}, Endereço: {self.endereco}, Porte: {self.tipo_empresa})"
+    
+    
 # end class Cliente
 
 """
