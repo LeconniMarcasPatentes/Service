@@ -1,3 +1,4 @@
+from planilha_module import Planilha
 import pandas as pd
 from docx import Document
 from datetime import datetime
@@ -24,15 +25,13 @@ class Cliente:
     # ToString ( )
     def __repr__(self):
         return f"Cliente(Razão Social: {self.razao_social}, CPF/CNPJ: {self.cpf_cnpj}, Endereço: {self.endereco}, Porte: {self.tipo_empresa})"
-    
-    
-# end class Cliente
+# Cliente
 
 """
     Ler uma planilha de clientes.
     @return Lista de Clientes.
 """
-def read_from_excel ( filepath ):
+""" def read_from_excel ( filepath ):
     
     df = pd.read_excel( filepath )
 
@@ -78,7 +77,7 @@ def read_from_excel ( filepath ):
 
     return clientes
 pass
-# end read_from_excel ( )
+# end read_from_excel ( ) """
 
 """
     Gravar numa planilha uma lista de Clientes. 
