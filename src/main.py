@@ -1,15 +1,17 @@
 from planilha_module import Planilha
+from cliente_module import Cliente
+from utils import *
 
-forms_filepath = 'data/raw/Respostas_Fomulario.xlsx'
+forms_filepath = "data/raw/Respostas_Fomulario.xlsx"
 
-respostas = Planilha.ler_formulario( forms_filepath )
+try:
+    
+    respostas = Planilha.ler_formulario( forms_filepath )
+    
+    Cliente.gravar_planilha_clientes( respostas )
+    # Vendedor.update_planilha_vendedor( vendedor, v_filepath )
 
-# Colocar id
+    # Cliente.gerar_contratos( clientes )
 
-# Cliente.update_planilha_clientes( clientes, c_filepath )
-# Vendedor.update_planilha_vendedor( vendedor, v_filepath )
-
-# Cliente.gerar_contratos( clientes )
-
-print( respostas[0] )
-
+except Exception as e:
+    print( f"\nOcorreu um erro ao processar o arquivo: {e}\n" )
