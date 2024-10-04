@@ -8,7 +8,7 @@ try:
     
     respostas = Planilha.ler_formulario( forms_filepath )
     
-    Cliente.gravar_planilha_clientes( respostas )
+    Cliente.atualizar_planilha_clientes( respostas )
     # Vendedor.update_planilha_vendedor( vendedor, v_filepath )
 
     # Cliente.gerar_contratos( clientes )
