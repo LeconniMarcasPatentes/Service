@@ -23,52 +23,72 @@ class Cliente:
         self.apresentacao      = apresentacao       # Tipo de Apresentação (Figurativa, Mista, Nominativa)
     # __init__ ( )
     
-    """ toString """
+    """ Cliente toString """
     def __str__(self):
         return f"Cliente(Razão Social: {self.razao_social}, CPF/CNPJ: {self.cpf_cnpj}, Endereço: {self.endereco}, Porte: {self.tipo_empresa})"
     # __str__ ( )
-
-    """ Gravar numa planilha uma lista de Clientes. """
-    def gravar_planilha_clientes( respostas ):
+    
+    """ Atualizar a planilha de clientes, adicionando novos clientes ou modificando existentes. """
+    def atualizar_planilha_clientes( clientes ):
         output_filepath = 'data/processed/Clientes.xlsx'
-        clientes = []
 
-        for res in respostas:
-            cliente_data = {
-                'Razao Social'      : res.cliente_razao_social,
-                'PF/PJ'             : res.cliente_pf_pj,
-                'CPF/CNPJ'          : res.cliente_cpf_cpnj,
-                'Tipo Empresa'      : res.cliente_tipo,
-                'Logradouro'        : res.cliente_endereco['logradouro'],
-                'Numero'            : res.cliente_endereco['numero'],
-                'Bairro'            : res.cliente_endereco['bairro'],
-                'Complemento'       : res.cliente_endereco['complemento'],
-                'Municipio'         : res.cliente_endereco['municipio'],
-                'UF'                : res.cliente_endereco['uf'],
-                'CEP'               : res.cliente_endereco['cep'],
-                'Telefone Empresa 1': res.cliente_telefone[0] if len(res.cliente_telefone) > 0 else '',
-                'Telefone Empresa 2': res.cliente_telefone[1] if len(res.cliente_telefone) > 1 else '',
-                'Telefone Empresa 3': res.cliente_telefone[2] if len(res.cliente_telefone) > 1 else '',
-                'Site Empresa'      : res.cliente_site,
-                'Nome Contato'      : res.contato_nome,
-                'Email Contato'     : res.contato_email,
-                'Cargo Contato'     : res.contato_cargo,
-                'Telefone Contato 1': res.contato_telefone[0] if len(res.contato_telefone) > 0 else '',
-                'Telefone Contato 2': res.contato_telefone[1] if len(res.contato_telefone) > 1 else '',
-                'Telefone Contato 3': res.contato_telefone[2] if len(res.contato_telefone) > 1 else '',
-                'Apresentacao'      : res.cliente_apresentacao
-            }
-            
-            clientes.append( cliente_data )
+        try:
+            try:
+                df_existente = pd.read_excel( output_filepath )
+            except FileNotFoundError:
+                df_existente = pd.DataFrame( )
 
-        df = pd.DataFrame( clientes )
+            novos_clientes = []
 
-        df.to_excel( output_filepath, index=False )
-    # end gravar_planilha_clientes ( )
+            for res in clientes:
+                cliente_data = {
+                    'Razao Social'      : res.cliente_razao_social,
+                    'PF/PJ'             : res.cliente_pf_pj,
+                    'CPF/CNPJ'          : res.cliente_cpf_cpnj,
+                    'Tipo Empresa'      : res.cliente_tipo,
+                    'Logradouro'        : res.cliente_endereco['logradouro'],
+                    'Numero'            : res.cliente_endereco['numero'],
+                    'Bairro'            : res.cliente_endereco['bairro'],
+                    'Complemento'       : res.cliente_endereco['complemento'],
+                    'Municipio'         : res.cliente_endereco['municipio'],
+                    'UF'                : res.cliente_endereco['uf'],
+                    'CEP'               : res.cliente_endereco['cep'],
+                    'Telefone Empresa 1': res.cliente_telefone[0] if len(res.cliente_telefone) > 0 else '',
+                    'Telefone Empresa 2': res.cliente_telefone[1] if len(res.cliente_telefone) > 1 else '',
+                    'Telefone Empresa 3': res.cliente_telefone[2] if len(res.cliente_telefone) > 2 else '',
+                    'Site Empresa'      : res.cliente_site,
+                    'Nome Contato'      : res.contato_nome,
+                    'Email Contato'     : res.contato_email,
+                    'Cargo Contato'     : res.contato_cargo,
+                    'Telefone Contato 1': res.contato_telefone[0] if len(res.contato_telefone) > 0 else '',
+                    'Telefone Contato 2': res.contato_telefone[1] if len(res.contato_telefone) > 1 else '',
+                    'Telefone Contato 3': res.contato_telefone[2] if len(res.contato_telefone) > 2 else '',
+                    'Apresentacao'      : res.cliente_apresentacao
+                }
 
-    """
-        Escrever os dados de um cliente no contrato.
-    """
+                # Verificar se o cliente já existe na planilha (baseado em CPF/CNPJ)
+                cliente_existente = df_existente[df_existente['CPF/CNPJ'] == cliente_data['CPF/CNPJ']]
+
+                if cliente_existente.empty:
+                    novos_clientes.append(cliente_data)
+                else:
+                    df_existente.update(pd.DataFrame([cliente_data]))
+
+            if novos_clientes:
+                df_novos = pd.DataFrame(novos_clientes)
+                df_atualizado = pd.concat([df_existente, df_novos], ignore_index=True)
+            else:
+                df_atualizado = df_existente
+
+            df_atualizado.to_excel(output_filepath, index=False)
+
+            print( f"Planilha de clientes atualizada com sucesso: {output_filepath}" )
+
+        except Exception as e:
+            print( f"Erro ao atualizar a planilha de clientes: {e}" )
+    # end atualizar_planilha_clientes ( )
+
+    """ Escrever os dados de um cliente no contrato. """
     def escrever_contrato ( tipo_contrato, cliente ):
         filepath1 = ""
         filepath2 = ""
@@ -78,7 +98,7 @@ class Cliente:
         elif tipo_contrato == "":
             contrato1( filepath2, outputpath, cliente )
     # end escrever_contrato ( )
-# Cliente
+# Clientes
 
 def contrato1 ( template_path, output_path, cliente ):
     doc = Document( template_path )
