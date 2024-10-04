@@ -6,9 +6,9 @@ from datetime import datetime
 
 # Classe Cliente
 class Cliente:
-    def __init__(self, razao_social, pf_pj, site_empresa, cpf_cnpj, tipo_empresa, 
-                 endereco, telefones_empresa, nome_contato, email_contato, cargo_contato, 
-                 telefones_contato, apresentacao):
+    def __init__(self, razao_social, pf_pj, site_empresa, cpf_cnpj, tipo_empresa, endereco, telefones_empresa, 
+                nome_contato, email_contato, cargo_contato, telefones_contato, apresentacao
+                ):
         self.razao_social      = razao_social       # Razão Social/Nome
         self.pf_pj             = pf_pj              # PF/PJ
         self.site_empresa      = site_empresa       # Endereço do Site da Empresa
@@ -24,8 +24,13 @@ class Cliente:
     # __init__ ( )
     
     """ Cliente toString """
-    def __str__(self):
-        return f"Cliente(Razão Social: {self.razao_social}, CPF/CNPJ: {self.cpf_cnpj}, Endereço: {self.endereco}, Porte: {self.tipo_empresa})"
+    def __str__( self ):
+        return (f"Cliente:\n"
+                f"Razão Social: {self.razao_social}\n" 
+                f"CPF/CNPJ....: {self.cpf_cnpj}\n"
+                f"Endereço....: {self.endereco}\n"
+                f"Porte.......: {self.tipo_empresa}\n"
+                )
     # __str__ ( )
     
     """ Atualizar a planilha de clientes, adicionando novos clientes ou modificando existentes. """
@@ -89,18 +94,18 @@ class Cliente:
     # end atualizar_planilha_clientes ( )
 
     """ Escrever os dados de um cliente no contrato. """
-    def escrever_contrato ( tipo_contrato, cliente ):
+    def escrever_contrato( tipo_contrato, cliente ):
         filepath1 = ""
         filepath2 = ""
         outputpath = ""
         if tipo_contrato == "":
             contrato1( filepath1, outputpath, cliente )
         elif tipo_contrato == "":
-            contrato1( filepath2, outputpath, cliente )
+            contrato2( filepath2, outputpath, cliente )
     # end escrever_contrato ( )
 # Clientes
 
-def contrato1 ( template_path, output_path, cliente ):
+def contrato1( template_path, output_path, cliente ):
     doc = Document( template_path )
     
     data_atual = datetime.now().strftime("%d/%m/%Y")  # Formato: dia/mês/ano
@@ -142,3 +147,46 @@ def contrato1 ( template_path, output_path, cliente ):
 
     doc.save( output_path )
 # end contrato1 ( )
+
+def contrato2( template_path, output_path, cliente ):
+    doc = Document( template_path )
+    
+    data_atual = datetime.now().strftime("%d/%m/%Y")  # Formato: dia/mês/ano
+    
+    for paragrafo in doc.paragraphs :
+        texto = paragrafo.text
+        # texto = texto.split()
+        
+        if '[NOME_CONTRATANTE],' in texto:
+            paragrafo.text = paragrafo.text.replace( '[NOME_CONTRATANTE],', cliente.razao_social.upper( )+ "," )
+            
+        if '[NACIONALIDADE_CONTRATANTE]' in texto:
+            paragrafo.text = paragrafo.text.replace( '[NACIONALIDADE_CONTRATANTE]', 'brasileira' )
+            
+        if '[CNPJ_CONTRATANTE],' in texto:
+            paragrafo.text = paragrafo.text.replace( '[CNPJ_CONTRATANTE],', formatar_cpf(cliente.cpf_cnpj)+"," if cliente == 'PF' else formatar_cnpj(cliente.cpf_cnpj)+"," ) 
+                
+        if '[ENDERCO_CONTRATANTE],' in texto:
+            endereco_completo = f"{cliente.endereco['logradouro']}, {cliente.endereco['numero']}, {cliente.endereco['bairro']}, {cliente.endereco['municipio']}/{cliente.endereco['uf']} - {formatar_cep(cliente.endereco['cep'])}"  
+            paragrafo.text = paragrafo.text.replace('[ENDERCO_CONTRATANTE],', endereco_completo+",")
+                        
+        if '[TITULO_PATENTE]' in texto:
+            paragrafo.text = paragrafo.text.replace( '[TITULO_PATENTE]', cliente.razao_social.upper( ) )   
+        
+        if '[VALOR_SERVIÇO]' in texto:
+            paragrafo.text = paragrafo.text.replace( '[VALOR_SERVIÇO]', '10.000,00')  
+                
+        if '[VALOR_INICIAL]' in texto:
+            paragrafo.text = paragrafo.text.replace( '[VALOR_INICIAL]', '5.000,00') 
+            
+        if '[VALOR_FINAL]' in texto:
+            paragrafo.text = paragrafo.text.replace( '[VALOR_FINAL]', '5.000,00')  
+                
+        if '[CIDADE_CONTRATANTE]' in texto:
+            paragrafo.text = paragrafo.text.replace( '[CIDADE_CONTRATANTE]', cliente.endereco['municipio'] )
+                    
+        if '[LOCAL_DATA]' in texto:
+            paragrafo.text = paragrafo.text.replace( '[LOCAL_DATA]', data_atual )
+
+    doc.save( output_path )
+# end contrato2 ( )
