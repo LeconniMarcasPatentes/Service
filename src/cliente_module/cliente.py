@@ -34,7 +34,7 @@ class Cliente:
     # __str__ ( )
     
     """ Atualizar a planilha de clientes, adicionando novos clientes ou modificando existentes. """
-    def atualizar_planilha_clientes( clientes ):
+    def gravar_planilha_clientes( clientes ):
         output_filepath = 'data/processed/Clientes.xlsx'
 
         try:
@@ -91,7 +91,7 @@ class Cliente:
 
         except Exception as e:
             print( f"Erro ao atualizar a planilha de clientes: {e}" )
-    # end atualizar_planilha_clientes ( )
+    # end gravar_planilha_clientes ( )
 
     """ Escrever os dados de um cliente no contrato. """
     def escrever_contrato( tipo_contrato, cliente ):
