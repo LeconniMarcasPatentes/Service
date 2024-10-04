@@ -183,3 +183,47 @@ def formatar_cep ( cep ):
     cep = str(cep).zfill(8)
     return f'{cep[:2]}.{cep[:5]}-{cep[5:]}'
 # end formatar_cep
+
+    """ Gravar numa planilha uma lista de Clientes. 
+        :param respostas = lista de resposta que contém todas as respostas já enviadas até o momento
+    """
+    def gravar_planilha_clientes( respostas ):
+        output_filepath = 'data/processed/Clientes.xlsx'
+        
+        # pegar o id do ultimo cliente gravado na planilha
+        id = get_ultimo_id_planilha( 'data/processed/Clientes.xlsx' )
+        
+        clientes = []
+
+        for res in respostas:
+            cliente_data = {
+                'Razao Social'      : res.cliente_razao_social,
+                'PF/PJ'             : res.cliente_pf_pj,
+                'CPF/CNPJ'          : res.cliente_cpf_cpnj,
+                'Tipo Empresa'      : res.cliente_tipo,
+                'Logradouro'        : res.cliente_endereco['logradouro'],
+                'Numero'            : res.cliente_endereco['numero'],
+                'Bairro'            : res.cliente_endereco['bairro'],
+                'Complemento'       : res.cliente_endereco['complemento'],
+                'Municipio'         : res.cliente_endereco['municipio'],
+                'UF'                : res.cliente_endereco['uf'],
+                'CEP'               : res.cliente_endereco['cep'],
+                'Telefone Empresa 1': res.cliente_telefone[0] if len(res.cliente_telefone) > 0 else '',
+                'Telefone Empresa 2': res.cliente_telefone[1] if len(res.cliente_telefone) > 1 else '',
+                'Telefone Empresa 3': res.cliente_telefone[2] if len(res.cliente_telefone) > 1 else '',
+                'Site Empresa'      : res.cliente_site,
+                'Nome Contato'      : res.contato_nome,
+                'Email Contato'     : res.contato_email,
+                'Cargo Contato'     : res.contato_cargo,
+                'Telefone Contato 1': res.contato_telefone[0] if len(res.contato_telefone) > 0 else '',
+                'Telefone Contato 2': res.contato_telefone[1] if len(res.contato_telefone) > 1 else '',
+                'Telefone Contato 3': res.contato_telefone[2] if len(res.contato_telefone) > 1 else '',
+                'Apresentacao'      : res.cliente_apresentacao
+            }
+            
+            clientes.append( cliente_data )
+
+        df = pd.DataFrame( clientes )
+
+        df.to_excel( output_filepath, index=False )
+    # end gravar_planilha_clientes ( )
