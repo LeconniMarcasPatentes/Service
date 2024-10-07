@@ -1,67 +1,77 @@
-from datetime import date
-from openpyxl import Workbook
+import os
+from openpyxl import Workbook, load_workbook
+from planilha_module import Planilha
 
 class Vendedor:
-  # atributos da classe
-  def __init__(self, nome, email, data_venda, valor_venda):
-    self.nome = nome
-    self.email = email
-    self.data_venda = data_venda
-    self.valor_venda = valor_venda
-    self.comissao = 0
+    # atributos da classe
+    def __init__(self, planilha: Planilha):
+        self.nome = planilha.vendedor_nome 
+        self.email = planilha.vendedor_email
+        self.data_venda = planilha.venda_data
+        self.valor_venda = planilha.venda_valor_total
+        self.comissao = self.calcular_comissao()
 
-  def calcular_comissao(self):
-    nomeVendedorDoEmail = self.email.split('@')[0]
+    def calcular_comissao(self):
+        nomeVendedorDoEmail = self.email.split('@')[0]
 
-    # comissao dos vendedores
-    vendedoresAtivos = {
-      'marconnirodrigues': 1,
-      'katianeves': 40,
-      'thiagogiardini': 40,
-      'wagneroliveira': 30,
-    }
+        # comissao dos vendedores
+        vendedoresAtivos = {
+            'marconnirodrigues': 100,
+            'katianeves': 40,
+            'thiagogiardini': 40,
+            'wagneroliveira': 30,
+        }
     
-    # pega o vendedor da lista, se não tiver presente ele recebe 0% de comissão
-    percentualDeComissao = vendedoresAtivos.get(nomeVendedorDoEmail, 0)
+        # pega o vendedor da lista, se não tiver presente ele recebe 0% de comissão
+        percentualDeComissao = vendedoresAtivos.get(nomeVendedorDoEmail, 0)
+
+        self.comissao = (percentualDeComissao / 100) * self.valor_venda
+
+    # to string
+    def valor_comissao(self):
+        return f'O vendedor {self.nome} vai receber R${self.comissao:.2f} de comissão.'
+
+def atualizarPlanilha(vendedores, nomeDoArquivo="Vendedores.xlsx"):
+    caminho = os.path.join("data", "processed", nomeDoArquivo)
     
-    self.comissao = (percentualDeComissao / 100) * self.valor_venda
-
-  # to string
-  def valor_comissao(self):
-    return f'O vendedor {self.nome} vai receber R${self.comissao:.2f} de comissão.'
-
-def criarPlanilha(vendedores, nomeDoArquivo="Vendedores.xlsx"):
-  workbook = Workbook()  # Correção aqui
-  
-  # Preencher a planilha para cada vendedor
-  for vendedor in vendedores:
-    # Criar uma nova planilha para cada vendedor
-    sheet = workbook.create_sheet(title=f"{vendedor.nome} - Semana {vendedor.data_venda.isocalendar()[1]}")
+    # Criar diretório se não existir
+    os.makedirs("data/processed", exist_ok=True)
     
-    # Adicionar cabeçalhos
-    sheet.append(["Nome do Vendedor", "Total Vendido", "Comissão"])
+    # Verifica se o arquivo já existe para carregar ou criar um novo
+    if os.path.exists(caminho):
+        workbook = load_workbook(caminho)
+    else:
+        workbook = Workbook()
+
+    for vendedor in vendedores:
+        semana_venda = vendedor.data_venda.isocalendar()[1]
+        nome_planilha = f"{vendedor.nome} - Semana {semana_venda}"
+
+        # Se a planilha do vendedor para a semana não existir, cria uma nova
+        if nome_planilha not in workbook.sheetnames:
+            sheet = workbook.create_sheet(title=nome_planilha)
+            # Adicionar cabeçalhos
+            sheet.append(["Nome do Vendedor", "Total Vendido", "Comissão"])
+        else:
+            sheet = workbook[nome_planilha]
     
-    # Calcular a comissão
-    vendedor.calcular_comissao()
+        # Verificar se há mudança de semana e adicionar linha de "X" se necessário
+        if sheet.max_row > 1:
+            ultima_semana = sheet.cell(row=sheet.max_row, column=1).value
+            if ultima_semana != semana_venda:
+                sheet.append(["X"] * 3)  # Adiciona uma linha com "X"
     
-    # Preencher a planilha com dados
-    sheet.append([vendedor.nome, vendedor.valor_venda, vendedor.comissao])
+        # Calcular a comissão
+        vendedor.calcular_comissao()
+    
+        # Preencher a planilha com dados
+        sheet.append([vendedor.nome, vendedor.valor_venda, vendedor.comissao])
 
-  # Remover a planilha padrão criada automaticamente
-  if "Sheet" in workbook.sheetnames:
-    del workbook["Sheet"]
-
-  # Salvar a planilha
-  workbook.save(nomeDoArquivo)
-
-vendedores = [
-  Vendedor("Marconni Rodrigues", "marconnirodrigues@example.com", date.today(), 1000),
-  Vendedor("Katiane Neves", "katianeves@example.com", date.today(), 2000),
-  Vendedor("Thiago Giardini", "thiagogiardini@example.com", date.today(), 1500),
-  Vendedor("Wagner Oliveira", "wagneroliveira@example.com", date.today(), 2500)
-]
-
-# Criar a planilha
-criarPlanilha(vendedores)
-
-print("Planilha criada com sucesso!")
+    # Remover a planilha padrão criada automaticamente se ela existir e for vazia
+    if "Sheet" in workbook.sheetnames:
+        del workbook["Sheet"]
+    
+    # Salvar a planilha
+    workbook.save(caminho)
+    print("Planilha VENDEDOR criada com sucesso!")
+# end atualizarPlanilha ( )
