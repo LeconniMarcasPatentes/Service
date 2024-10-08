@@ -41,34 +41,38 @@ class Cliente:
             try:
                 df_existente = pd.read_excel( output_filepath )
             except FileNotFoundError:
-                df_existente = pd.DataFrame( )
+                df_existente = pd.DataFrame(columns=['RAZAO SOCIAL' , 'CPF/CNPJ','PF/PJ','TIPO EMPRESA' ,'LOGRADOURO','NUMERO' ,
+                                            'BAIRRO','COMPLEMENTO'  ,'MUNICIPIO' ,'UF','CEP'  ,'TELEFONE EMPRESA 1',
+                                            'TELEFONE EMPRESA 2','TELEFONE EMPRESA 3','SITE EMPRESA' ,'NOME CONTATO' ,
+                                            'EMAIL CONTATO','CARGO CONTATO','TELEFONE CONTATO 1','TELEFONE CONTATO 2',
+                                            'TELEFONE CONTATO 3', 'APRESENTACAO'])
 
             novos_clientes = []
 
             for res in clientes:
                 cliente_data = {
-                    'Razao Social'      : res.cliente_razao_social,
-                    'PF/PJ'             : res.cliente_pf_pj,
+                    'RAZAO SOCIAL'      : res.cliente_razao_social,
                     'CPF/CNPJ'          : res.cliente_cpf_cpnj,
-                    'Tipo Empresa'      : res.cliente_tipo,
-                    'Logradouro'        : res.cliente_endereco['logradouro'],
-                    'Numero'            : res.cliente_endereco['numero'],
-                    'Bairro'            : res.cliente_endereco['bairro'],
-                    'Complemento'       : res.cliente_endereco['complemento'],
-                    'Municipio'         : res.cliente_endereco['municipio'],
+                    'PF/PJ'             : res.cliente_pf_pj,
+                    'TIPO EMPRESA'      : res.cliente_tipo,
+                    'LOGRADOURO'        : res.cliente_endereco['logradouro'],
+                    'NUMERO'            : res.cliente_endereco['numero'],
+                    'BAIRRO'            : res.cliente_endereco['bairro'],
+                    'COMPLEMENTO'       : res.cliente_endereco['complemento'],
+                    'MUNICIPIO'         : res.cliente_endereco['municipio'],
                     'UF'                : res.cliente_endereco['uf'],
                     'CEP'               : res.cliente_endereco['cep'],
-                    'Telefone Empresa 1': res.cliente_telefone[0] if len(res.cliente_telefone) > 0 else '',
-                    'Telefone Empresa 2': res.cliente_telefone[1] if len(res.cliente_telefone) > 1 else '',
-                    'Telefone Empresa 3': res.cliente_telefone[2] if len(res.cliente_telefone) > 2 else '',
-                    'Site Empresa'      : res.cliente_site,
-                    'Nome Contato'      : res.contato_nome,
-                    'Email Contato'     : res.contato_email,
-                    'Cargo Contato'     : res.contato_cargo,
-                    'Telefone Contato 1': res.contato_telefone[0] if len(res.contato_telefone) > 0 else '',
-                    'Telefone Contato 2': res.contato_telefone[1] if len(res.contato_telefone) > 1 else '',
-                    'Telefone Contato 3': res.contato_telefone[2] if len(res.contato_telefone) > 2 else '',
-                    'Apresentacao'      : res.cliente_apresentacao
+                    'TELEFONE EMPRESA 1': res.cliente_telefone[0] if len(res.cliente_telefone) > 0 else '',
+                    'TELEFONE EMPRESA 2': res.cliente_telefone[1] if len(res.cliente_telefone) > 1 else '',
+                    'TELEFONE EMPRESA 3': res.cliente_telefone[2] if len(res.cliente_telefone) > 2 else '',
+                    'SITE EMPRESA'      : res.cliente_site,
+                    'NOME CONTATO'      : res.contato_nome,
+                    'EMAIL CONTATO'     : res.contato_email,
+                    'CARGO CONTATO'     : res.contato_cargo,
+                    'TELEFONE CONTATO 1': res.contato_telefone[0] if len(res.contato_telefone) > 0 else '',
+                    'TELEFONE CONTATO 2': res.contato_telefone[1] if len(res.contato_telefone) > 1 else '',
+                    'TELEFONE CONTATO 3': res.contato_telefone[2] if len(res.contato_telefone) > 2 else '',
+                    'APRESENTACAO'      : res.cliente_apresentacao
                 }
 
                 # Verificar se o cliente já existe na planilha (baseado em CPF/CNPJ)
