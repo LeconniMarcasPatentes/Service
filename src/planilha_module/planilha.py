@@ -22,7 +22,7 @@ class Planilha:
         self.contato_nome         = contato_nome
         self.contato_email        = contato_email
         self.contato_cargo        = contato_cargo
-        self.contato_telefone     = contato_telefone 
+        self.contato_telefone     = contato_telefone
         self.venda_valor_total    = venda_valor_total
         self.venda_valor_inicial  = venda_valor_inicial
         self.venda_valor_final    = venda_valor_final
