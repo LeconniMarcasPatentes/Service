@@ -13,7 +13,6 @@ pip install mailmerge
 pip install docx-mailmerge
 pip install pyinstaller
 
-
 REM Executar o programa
 cls
 python main.py
