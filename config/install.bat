@@ -11,7 +11,7 @@ pip instal openpyxl
 pip install python-docx
 pip install mailmerge
 pip install docx-mailmerge
-
+pip install pyinstaller
 
 REM Executar o programa
 cls
