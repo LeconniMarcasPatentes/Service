@@ -13,11 +13,11 @@ class Vendedor:
     """ Vendedor toString """
     def __str__(self) -> str:
         return (f"Vendedor:\n"
-                f"Nome................: {self.vendedor_nome}\n"
-                f"E-mail..............: {self.vendedor_email}\n"
-                f"Data da Venda.......: {self.venda_data}\n"
-                f"Valor Total da Venda: {self.venda_valor_total}\n"
-                f"Valor da Comissão...: {self.vendedor_comissao}\n"
+                f"Nome.................: {self.vendedor_nome    }\n"
+                f"E-mail...............: {self.vendedor_email   }\n"
+                f"Data da Venda........: {self.venda_data       }\n"
+                f"Valor Total da Venda.: {self.venda_valor_total}\n"
+                f"Valor da Comissão....: {self.vendedor_comissao}\n"
                 )
     # __str__ ( )
     
@@ -30,6 +30,10 @@ class Vendedor:
                 df_existente = pd.read_excel(output_filepath)
             except FileNotFoundError:
                 df_existente = pd.DataFrame()
+            
+            # Verificar se a coluna 'NOME INPI' existe, caso contrário, criar uma nova
+            if 'NOME INPI' not in df_existente.columns:
+                df_existente['NOME INPI'] = None
 
             novos_vendedores = []
 
@@ -39,12 +43,20 @@ class Vendedor:
                 vendedores_data = {
                     'NOME'                 : res.vendedor_nome,
                     'EMAIL'                : res.vendedor_email,
-                    'DATA DA VENDA'        : res.venda_data,
+                    'DATA DA VENDA'        : pd.to_datetime(res.venda_data).strftime('%d/%m/%Y'),
                     'VALOR TOTAL DA VENDA' : res.venda_valor_total,
-                    'COMISSAO'             : vendedor_comissao
+                    'COMISSAO'             : vendedor_comissao,
+                    'NOME INPI'            : res.cliente_nome_inpi
                 }
                 
-                novos_vendedores.append(vendedores_data)
+                venda_existente = df_existente[
+                    (df_existente['NOME INPI'] == vendedores_data['NOME INPI']) 
+                ]
+                
+                if venda_existente.empty:
+                    novos_vendedores.append(vendedores_data)
+                else:
+                    df_existente.update(pd.DataFrame([vendedores_data]))
 
             df_novos = pd.DataFrame(novos_vendedores)
             df_final = pd.concat([df_existente, df_novos], ignore_index=True)
